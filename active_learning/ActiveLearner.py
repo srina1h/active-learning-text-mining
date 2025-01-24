@@ -5,14 +5,15 @@ class ActiveLearner:
     def __init__(self, data_handler):
         self.data_handler = data_handler
 
-    def run_initial(self, no_samples_yes, sample_ratio=0.25):
+    def select_initial_data(self, no_samples_yes, sample_ratio=0.25):
         self.data_handler.select_samples_initial(no_samples_yes, sample_ratio)
     
     def weighted_best_from_rest(self, probabilities, q):
         """
         Compute the acquisition function (Best + q * Rest) / |q * Best - Rest| for binary classification.
         """
-        # Extract Best and Rest probabilities
+        # Extract Best and Rest probabili
+        # ties
         best = np.max(probabilities, axis=1)  # Best confidence score
         rest = np.min(probabilities, axis=1)  # Rest confidence score
 
@@ -20,14 +21,16 @@ class ActiveLearner:
         scores = (best + q * rest) / np.abs(q * best - rest)
         return scores
     
-    def run_active_learning(self, no_iterations, initial_q = 1.5):
+    def run_active_learning(self, no_iterations, initial_q = 1):
         # run a scikitlearn naive bayes classifier
 
-        final_q = 0.5
+        final_q = 0 
+
+        recalls = np.zeros(no_iterations)
 
         for i in range(no_iterations):
             q = initial_q - (initial_q - final_q) * i / no_iterations
-            
+
             print(f"############# Running iteration {i+1}")
             clf = sk.naive_bayes.GaussianNB()
             clf.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
@@ -59,4 +62,6 @@ class ActiveLearner:
 
             # decrease q by 0.1 to favor exploitation over exploration
             q -= 0.1
-        return
+
+            recalls[i] = recall
+        return recalls

@@ -1,13 +1,10 @@
 import pandas as pd
 import os
 
-
-
 class DataHandler:
     def __init__(self, file_path):
-        self.current_main_set = self.load_preprocessed_data(file_path)
-        self.current_X = pd.DataFrame()
-        self.current_y = pd.DataFrame()
+        self.full_dataset = self.load_preprocessed_data(file_path)
+        self.resample_main_set()
 
     def load_preprocessed_data(self, file_path):
         try:
@@ -43,3 +40,9 @@ class DataHandler:
         self.current_y = pd.concat([self.current_y, next_samples['label']])
 
         return
+    
+    def resample_main_set(self, sample_percent = 0.9):
+        # randomly sample 90% of the data for the main set
+        self.current_main_set = self.full_dataset.sample(frac=sample_percent)
+        self.current_X = pd.DataFrame()
+        self.current_y = pd.DataFrame()
