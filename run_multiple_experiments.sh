@@ -19,7 +19,7 @@ RAW_DATA_DIR=data_folder
 # Runtime parameters
 iteration_type=all
 no_iterations=100
-no_statistical_validation=5
+no_statistical_validation=20
 
 for top_tf_idf in 50 25 10 5
 do
