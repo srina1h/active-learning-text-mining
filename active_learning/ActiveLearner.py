@@ -18,20 +18,24 @@ class ActiveLearner:
         rest = np.min(probabilities, axis=1)  # Rest confidence score
 
         # Compute the acquisition function
-        scores = (best + q * rest) / np.abs(q * best - rest)
+        scores = (best + q * rest) / (np.abs(q * best - rest) + 1e-10)
         return scores
     
-    def run_active_learning(self, no_iterations, initial_q = 1):
-        # run a scikitlearn naive bayes classifier
+    def run_active_learning(self, output_folder, no_iterations, initial_q = 1):
 
-        final_q = 0 
+        final_q = 0
+        labeling_budget = 100
 
         recalls = np.zeros(no_iterations)
 
         for i in range(no_iterations):
-            q = initial_q - (initial_q - final_q) * i / no_iterations
+            if i < labeling_budget:
+                q = initial_q - (initial_q - final_q) * i / no_iterations
+            else:
+                q = final_q
 
-            print(f"############# Running iteration {i+1}")
+            # print(f"############# Running iteration {i+1}")
+
             clf = sk.naive_bayes.GaussianNB()
             clf.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
 
@@ -42,26 +46,27 @@ class ActiveLearner:
 
             # calculate precision recall and F1 score
 
-            predictions = clf.predict(current_main_set_X)
+            # get predictions on the entire dataset
+            predictions = clf.predict(self.data_handler.test_X)
+
+            # get probabilities on the remaining dataset to acquire new samples
             probabilities = clf.predict_proba(current_main_set_X)
 
-            accuracy = sk.metrics.accuracy_score(current_main_set_y, predictions)
-            precision = sk.metrics.precision_score(current_main_set_y, predictions, average='binary', pos_label='yes')
-            recall = sk.metrics.recall_score(current_main_set_y, predictions, average='binary', pos_label='yes')
-            f1 = sk.metrics.f1_score(current_main_set_y, predictions, average='binary', pos_label='yes')
+            # Performance on entire dataset
+            accuracy = sk.metrics.accuracy_score(self.data_handler.test_y, predictions)
+            precision = sk.metrics.precision_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
+            recall = sk.metrics.recall_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
+            f1 = sk.metrics.f1_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
             
-            print(f"Iteration {i+1}, Accuracy: {accuracy}")
-            print(f"Iteration {i+1}, Precision: {precision}")
-            print(f"Iteration {i+1}, Recall: {recall}")
-            print(f"Iteration {i+1}, F1: {f1}")
+            # print(f"Iteration {i+1}, Accuracy: {accuracy}")
+            # print(f"Iteration {i+1}, Precision: {precision}")
+            # print(f"Iteration {i+1}, Recall: {recall}")
+            # print(f"Iteration {i+1}, F1: {f1}")
 
             # calculate the acquisition function`s scores
             scores = self.weighted_best_from_rest(probabilities, q)
 
             self.data_handler.select_next_active_learning_sample(scores, 1)
-
-            # decrease q by 0.1 to favor exploitation over exploration
-            q -= 0.1
 
             recalls[i] = recall
         return recalls

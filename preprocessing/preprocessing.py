@@ -39,6 +39,9 @@ class DataPreprocessor:
         if 'abs' in self.cleaned_df.columns:
             self.cleaned_df = self.cleaned_df.drop(columns=['abs'])
 
+        # change the label to binary from yes no to 0, 1
+        self.cleaned_df['label'] = self.cleaned_df['label'].apply(lambda x: 1 if x == 'yes' else 0)
+
     def load_data(self):
         """
         Load the CSV file into a pandas DataFrame.

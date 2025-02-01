@@ -5,6 +5,11 @@ class DataHandler:
     def __init__(self, file_path):
         self.full_dataset = self.load_preprocessed_data(file_path)
         self.resample_main_set()
+        self.set_test_set()
+    
+    def set_test_set(self):
+        self.test_X = self.full_dataset.drop('label', axis=1)
+        self.test_y = self.full_dataset['label']
 
     def load_preprocessed_data(self, file_path):
         try:
@@ -18,11 +23,11 @@ class DataHandler:
         no_samples_no = int(no_samples_yes * (1/sample_ratio))
 
         # select 4 'yes' rows from the end and drop from main set
-        yes_rows = self.current_main_set[self.current_main_set['label'] == 'yes'].tail(no_samples_yes)
+        yes_rows = self.current_main_set[self.current_main_set['label'] == 1].tail(no_samples_yes)
         self.current_main_set.drop(yes_rows.index, inplace=True)
 
         # select 16 'no' rows at random ansd drop from main set
-        no_rows = self.current_main_set[self.current_main_set['label'] == 'no'].sample(no_samples_no)
+        no_rows = self.current_main_set[self.current_main_set['label'] == 0].sample(no_samples_no)
         self.current_main_set.drop(no_rows.index, inplace=True)
 
         # combine the selected rows to create the initial training set
