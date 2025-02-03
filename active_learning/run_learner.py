@@ -18,6 +18,7 @@ def main():
     parser.add_argument('iteration_type', type=str, help=' all or few - Run active learning on all samples? or custom - specified in no_iterations', default='all')
     parser.add_argument('no_iterations', type=int, help='Number of iterations to run the active learner', default=10)
     parser.add_argument('no_statistical_validation', type=int, help='Number of iterations to run the active learner', default=20)
+    parser.add_argument('tfidf', type=int, help='top tfidf feature count', default=50)
 
     args = parser.parse_args()
 
@@ -31,9 +32,9 @@ def main():
     
     OUTPUT_FOLDER = args.output_folder + '/' + args.filename
 
-    perform_stat_validation_on_multiple_start(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations)
+    perform_stat_validation_on_multiple_start(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf)
 
-def perform_stat_validation_on_multiple_start(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations):
+def perform_stat_validation_on_multiple_start(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf):
     sample_ratio = 0.25
     initial_samples_yes = [8, 16, 32]
 
@@ -51,7 +52,7 @@ def perform_stat_validation_on_multiple_start(file_path, filename, output_folder
         seventy_fives.append(per_75)
         
     # put the different initial yes sample starts in the same graph
-    create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recall, initial_samples_yes, filename, output_folder, itr, no_statistical_validation)
+    create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recall, initial_samples_yes, filename, output_folder, itr, no_statistical_validation, top_tfidf)
 
 def perform_stat_validation(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, initial_samples_yes, sample_ratio):
     data_handler = DataHandler(file_path)

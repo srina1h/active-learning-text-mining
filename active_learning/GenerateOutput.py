@@ -42,20 +42,25 @@ def create_stat_graph(per_50, per_25, per_75, baselines, filename, output_folder
     plt.clf()
     # plt.errorbar(range(len(mean)), mean, yerr=std, label='Active Learner')
     sns.set_style("whitegrid")
-    sns.lineplot(x=range(len(per_50)), y=per_50, label='50th percentile', linestyle='solid')
-    sns.lineplot(x=range(len(per_25)), y=per_25, label='25th percentile', linestyle='dotted')
-    sns.lineplot(x=range(len(per_75)), y=per_75, label='75th percentile', linestyle='dashed')
-    plt.fill_between(range(len(per_25)), per_25, per_75, alpha=0.2)
-    sns.lineplot(x=range(len(baselines)), y=baselines, label='Baseline', linestyle='dashdot', palette='Reds')
+    plt.plot(per_50, label='50th percentile', linestyle='solid', color='royalblue')
+    plt.plot(per_25, label='25th percentile', linestyle='dotted', color='skyblue')
+    plt.plot(per_75, label='75th percentile', linestyle='dashed', color='skyblue')
+    # sns.lineplot(x=range(len(per_50)), y=per_50, label='50th percentile', linestyle='solid')
+    # sns.lineplot(x=range(len(per_25)), y=per_25, label='25th percentile', linestyle='dotted')
+    # sns.lineplot(x=range(len(per_75)), y=per_75, label='75th percentile', linestyle='dashed')
+    plt.fill_between(range(len(per_25)), per_25, per_75, alpha=0.2, color='skyblue')
+    plt.plot(baselines, label='Baseline', linestyle='dashdot', color='red')
+    # sns.lineplot(x=range(len(baselines)), y=baselines, label='Baseline', linestyle='dashdot', palette='Reds')
     plt.xlabel('Per iteration recall variance ('+str(iterations)+' iterations over '+str(no_statistical_validation)+' runs)')
     plt.ylabel('Recall')
     plt.ylim(0, 1)
+    plt.xscale('log')
     plt.legend()
     plt.title('Learner Recall variance')
     plt.savefig(output_folder+'/statistical_performance_'+filename+'.png')
     return
 
-def create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recalls, starts, filename, output_folder, iterations, no_statistical_validation):
+def create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recalls, starts, filename, output_folder, iterations, no_statistical_validation, top_tfidf):
     # plt.clf()
     # for i, start in enumerate(starts):
     #     plt.errorbar(range(len(means[i])), means[i], yerr=stds[i], label='Learner start at - '+str(start))
@@ -69,21 +74,27 @@ def create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recalls
     plt.clf()
     sns.set_style("whitegrid")
 
-    pallettes = ['Oranges', 'Blues', 'Greens']
+    colors = ['royalblue', 'orange', 'green']
+    colorbands = ['skyblue', 'gold', 'mediumaquamarine']
 
     for i, start in enumerate(starts):
-        sns.lineplot(x=range(len(fifties[i])), y=fifties[i], label='50th percentile - Learner start at - '+str(start), linestyle='solid')
-        sns.lineplot(x=range(len(twenty_fives[i])), y=twenty_fives[i], label='25th percentile - Learner start at - '+str(start), linestyle='dotted')
-        sns.lineplot(x=range(len(seventy_fives[i])), y=seventy_fives[i], label='75th percentile - Learner start at - '+str(start), linestyle='dashed')
-        plt.fill_between(range(len(twenty_fives[i])), twenty_fives[i], seventy_fives[i], alpha=0.2)
-        sns.color_palette(palette=pallettes[i])
+        plt.plot(fifties[i], label='50th percentile - Learner start at - '+str(start), linestyle='solid', color=colors[i])
+        plt.plot(twenty_fives[i], label='25th percentile - Learner start at - '+str(start), linestyle='dotted', color=colorbands[i])
+        plt.plot(seventy_fives[i], label='75th percentile - Learner start at - '+str(start), linestyle='dashed', color=colorbands[i])
+        plt.fill_between(range(len(twenty_fives[i]), twenty_fives[i], seventy_fives[i], alpha=0.2, color=colorbands[i]))
+        # sns.lineplot(x=range(len(fifties[i])), y=fifties[i], label='50th percentile - Learner start at - '+str(start), linestyle='solid', color )
+        # sns.lineplot(x=range(len(twenty_fives[i])), y=twenty_fives[i], label='25th percentile - Learner start at - '+str(start), linestyle='dotted')
+        # sns.lineplot(x=range(len(seventy_fives[i])), y=seventy_fives[i], label='75th percentile - Learner start at - '+str(start), linestyle='dashed')
+        # plt.fill_between(range(len(twenty_fives[i])), twenty_fives[i], seventy_fives[i], alpha=0.2)
     
-    sns.lineplot(x=range(len(baseline_recalls)), y=baseline_recalls, label='Baseline', linestyle='dashdot')
+    # sns.lineplot(x=range(len(baseline_recalls)), y=baseline_recalls, label='Baseline', linestyle='dashdot')
+    plt.plot(baseline_recalls, label='Baseline', linestyle='dashdot', color='red')
 
     plt.xlabel('Per iteration recall variance ('+str(iterations)+' iterations over '+str(no_statistical_validation)+' runs)')
     plt.ylabel('Recall')
     plt.ylim(0, 1)
+    plt.xscale('log')
     plt.legend()
-    plt.title('Learner Recall starting with multiple initial yes samples')
+    plt.title('Learner Recalls with '+str(top_tfidf)+'tfidf features')
     plt.savefig(output_folder+'/combined_statistical_performance_'+filename+'.png')
     return
