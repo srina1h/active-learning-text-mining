@@ -33,6 +33,6 @@ do
     for file in Hall Kitchenham Wahono Radjenovic
     do
         mkdir -p $OUTPUT_DIR/$file
-        python3 $FILENAME $PREPROCESSED_DATA_DIR $OUTPUT_DIR $file $iteration_type $no_iterations $no_statistical_validation
+        python3 $FILENAME $PREPROCESSED_DATA_DIR $OUTPUT_DIR $file $iteration_type $no_iterations $no_statistical_validation $top_tf_idf
     done
 done

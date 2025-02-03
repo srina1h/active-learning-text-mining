@@ -4,6 +4,7 @@ import argparse
 from ActiveLearner import ActiveLearner
 from GenerateOutput import *
 import numpy as np
+import time
 
 # run a command line interface for the active learner
 # example usage: python3 active_learning/run_learner.py preprocessed_data output Hall 4 0.25 10 50
@@ -45,8 +46,11 @@ def perform_stat_validation_on_multiple_start(file_path, filename, output_folder
     for no_yes in initial_samples_yes:
         sub_output_folder = output_folder + '/' + str(no_yes) + '_' + str(no_statistical_validation) + '_' + str(no_iterations)
         os.makedirs(sub_output_folder, exist_ok=True)
+        # time the time to perform stat validation
+        st = time.time()
         per_50, per_25, per_75, itr, baseline_recall = perform_stat_validation(file_path, filename, sub_output_folder, no_statistical_validation, iteration_type, no_iterations, no_yes, sample_ratio)
-
+        et = time.time()
+        print(f"Avg Time taken for active learner to learn over {iteration_type} iterations: {(et-st)/no_statistical_validation}")
         fifties.append(per_50)
         twenty_fives.append(per_25)
         seventy_fives.append(per_75)
@@ -74,11 +78,15 @@ def perform_stat_validation(file_path, filename, output_folder, no_statistical_v
     output_file.write(f"Running statistical validation for {no_statistical_validation} runs:\n")
 
     for i in range(no_statistical_validation):
+        st = time.time()
 
         data_handler.resample_main_set(0.9)
 
         learner.select_initial_data(initial_samples_yes, sample_ratio)
         recalls = learner.run_active_learning(output_folder, no_iterations)
+
+        et = time.time()
+        print(f"Avg time taken by learner per iteration: {(et-st)/no_iterations}")
 
         total_recall[i] = recalls
 
