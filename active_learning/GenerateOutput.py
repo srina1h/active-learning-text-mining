@@ -81,7 +81,7 @@ def create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recalls
         plt.plot(fifties[i], label='50th percentile - Learner start at - '+str(start), linestyle='solid', color=colors[i])
         plt.plot(twenty_fives[i], label='25th percentile - Learner start at - '+str(start), linestyle='dotted', color=colorbands[i])
         plt.plot(seventy_fives[i], label='75th percentile - Learner start at - '+str(start), linestyle='dashed', color=colorbands[i])
-        plt.fill_between(range(len(twenty_fives[i]), twenty_fives[i], seventy_fives[i], alpha=0.2, color=colorbands[i]))
+        plt.fill_between(range(len(twenty_fives[i])), twenty_fives[i], seventy_fives[i], alpha=0.2, color=colorbands[i])
         # sns.lineplot(x=range(len(fifties[i])), y=fifties[i], label='50th percentile - Learner start at - '+str(start), linestyle='solid', color )
         # sns.lineplot(x=range(len(twenty_fives[i])), y=twenty_fives[i], label='25th percentile - Learner start at - '+str(start), linestyle='dotted')
         # sns.lineplot(x=range(len(seventy_fives[i])), y=seventy_fives[i], label='75th percentile - Learner start at - '+str(start), linestyle='dashed')
