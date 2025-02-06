@@ -24,7 +24,7 @@ def create_baseline_graph(recall, filename, output_folder):
     plt.xlabel('Number of samples')
     plt.ylabel('Recall')
     plt.title(filename+'\'s Recall vs Number of samples')
-    plt.savefig(output_folder+'/baseline_performance_'+filename+'.png')
+    plt.savefig(output_folder+'/baseline_performance_'+filename+'.pdf')
 
 def create_active_learning_graph(recalls, baseline_recall, filename, output_folder):
     plt.clf()
@@ -36,41 +36,31 @@ def create_active_learning_graph(recalls, baseline_recall, filename, output_fold
     plt.ylim(0, 1)
     plt.legend()
     plt.title('Learner Recall vs Baseline Recall')
-    plt.savefig(output_folder+'/active_learning_performance_'+filename+'.png')
+    plt.savefig(output_folder+'/active_learning_performance_'+filename+'.pdf')
 
-def create_stat_graph(per_50, per_25, per_75, baselines, filename, output_folder, iterations, no_statistical_validation):
+def create_stat_graph(per_50, per_25, per_75, baselines, filename, output_folder, iterations, no_statistical_validation, labeling_budget):
     plt.clf()
-    # plt.errorbar(range(len(mean)), mean, yerr=std, label='Active Learner')
     sns.set_style("whitegrid")
-    plt.plot(per_50, label='50th percentile', linestyle='solid', color='royalblue')
-    plt.plot(per_25, label='25th percentile', linestyle='dotted', color='skyblue')
-    plt.plot(per_75, label='75th percentile', linestyle='dashed', color='skyblue')
-    # sns.lineplot(x=range(len(per_50)), y=per_50, label='50th percentile', linestyle='solid')
-    # sns.lineplot(x=range(len(per_25)), y=per_25, label='25th percentile', linestyle='dotted')
-    # sns.lineplot(x=range(len(per_75)), y=per_75, label='75th percentile', linestyle='dashed')
-    plt.fill_between(range(len(per_25)), per_25, per_75, alpha=0.2, color='skyblue')
+
+    x_coor = range(labeling_budget, len(per_25) + labeling_budget)
+    plt.plot(x_coor, per_50, label='50th percentile', linestyle='solid', color='royalblue')
+    plt.plot(x_coor, per_25, label='25th percentile', linestyle='dotted', color='skyblue')
+    plt.plot(x_coor, per_75, label='75th percentile', linestyle='dashed', color='skyblue')
+
+    plt.fill_between(x_coor, per_25, per_75, alpha=0.2, color='skyblue')
     plt.plot(baselines, label='Baseline', linestyle='dashdot', color='red')
-    # sns.lineplot(x=range(len(baselines)), y=baselines, label='Baseline', linestyle='dashdot', palette='Reds')
     plt.xlabel('Per iteration recall variance ('+str(iterations)+' iterations over '+str(no_statistical_validation)+' runs)')
+    plt.axvline(x=labeling_budget, color='black', linestyle='dotted', alpha=0.5)
+    plt.text(labeling_budget, 0.1, 'Labeling Budget', rotation=90)
     plt.ylabel('Recall')
     plt.ylim(0, 1)
     plt.xscale('log')
     plt.legend()
     plt.title('Learner Recall variance')
-    plt.savefig(output_folder+'/statistical_performance_'+filename+'.png')
+    plt.savefig(output_folder+'/statistical_performance_'+filename+'.pdf', bbox_inches='tight')
     return
 
 def create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recalls, starts, filename, output_folder, iterations, no_statistical_validation, top_tfidf):
-    # plt.clf()
-    # for i, start in enumerate(starts):
-    #     plt.errorbar(range(len(means[i])), means[i], yerr=stds[i], label='Learner start at - '+str(start))
-    # plt.xlabel('Per iteration recall variance ('+str(iterations)+' iterations over '+str(no_statistical_validation)+' runs)')
-    # plt.ylabel('Recall')
-    # plt.ylim(0, 1)
-    # plt.legend()
-    # plt.savefig(output_folder+'/combined_statistical_performance_'+filename+'.png')
-
-    # convert this into a seabron line graph plot
     plt.clf()
     sns.set_style("whitegrid")
 
@@ -78,23 +68,23 @@ def create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recalls
     colorbands = ['skyblue', 'gold', 'mediumaquamarine']
 
     for i, start in enumerate(starts):
-        plt.plot(fifties[i], label='50th percentile - Learner start at - '+str(start), linestyle='solid', color=colors[i])
-        plt.plot(twenty_fives[i], label='25th percentile - Learner start at - '+str(start), linestyle='dotted', color=colorbands[i])
-        plt.plot(seventy_fives[i], label='75th percentile - Learner start at - '+str(start), linestyle='dashed', color=colorbands[i])
-        plt.fill_between(range(len(twenty_fives[i])), twenty_fives[i], seventy_fives[i], alpha=0.2, color=colorbands[i])
-        # sns.lineplot(x=range(len(fifties[i])), y=fifties[i], label='50th percentile - Learner start at - '+str(start), linestyle='solid', color )
-        # sns.lineplot(x=range(len(twenty_fives[i])), y=twenty_fives[i], label='25th percentile - Learner start at - '+str(start), linestyle='dotted')
-        # sns.lineplot(x=range(len(seventy_fives[i])), y=seventy_fives[i], label='75th percentile - Learner start at - '+str(start), linestyle='dashed')
-        # plt.fill_between(range(len(twenty_fives[i])), twenty_fives[i], seventy_fives[i], alpha=0.2)
-    
-    # sns.lineplot(x=range(len(baseline_recalls)), y=baseline_recalls, label='Baseline', linestyle='dashdot')
+        x_coor = range(start, len(twenty_fives[i]) + start)
+        plt.plot(x_coor, fifties[i], label='50th percentile - Learner start at - '+str(start), linestyle='solid', color=colors[i])
+        plt.plot(x_coor, twenty_fives[i], label='25th percentile - Learner start at - '+str(start), linestyle='dotted', color=colorbands[i])
+        plt.plot(x_coor, seventy_fives[i], label='75th percentile - Learner start at - '+str(start), linestyle='dashed', color=colorbands[i])
+
+        plt.fill_between(x_coor, twenty_fives[i], seventy_fives[i], alpha=0.2, color=colorbands[i])
+
+        plt.axvline(x=start, color='black', linestyle='dotted', alpha=0.5)
+        plt.text(start, 0.1, 'Labeling Budget - '+str(start), rotation=90)
+
     plt.plot(baseline_recalls, label='Baseline', linestyle='dashdot', color='red')
 
     plt.xlabel('Per iteration recall variance ('+str(iterations)+' iterations over '+str(no_statistical_validation)+' runs)')
     plt.ylabel('Recall')
     plt.ylim(0, 1)
     plt.xscale('log')
-    plt.legend()
-    plt.title('Learner Recalls with '+str(top_tfidf)+'tfidf features')
-    plt.savefig(output_folder+'/combined_statistical_performance_'+filename+'.png')
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.title('Learner Recalls with '+str(top_tfidf)+' TF-IDF features')
+    plt.savefig(output_folder+'/combined_statistical_performance_'+filename+'.pdf', bbox_inches='tight')
     return

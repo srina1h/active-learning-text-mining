@@ -26,9 +26,17 @@ class DataHandler:
         yes_rows = self.current_main_set[self.current_main_set['label'] == 1].tail(no_samples_yes)
         self.current_main_set.drop(yes_rows.index, inplace=True)
 
-        # select 16 'no' rows at random ansd drop from main set
-        no_rows = self.current_main_set[self.current_main_set['label'] == 0].sample(no_samples_no)
+        # # select 16 'no' rows at random ansd drop from main set
+        # no_rows = self.current_main_set[self.current_main_set['label'] == 0].sample(no_samples_no)
+        # self.current_main_set.drop(no_rows.index, inplace=True)
+
+        # ALTERNATE METHOD FOR SELECTING NO SAMPLES (2/5/25)
+
+        # select no_samples_no rows at random. Assume they are negative samples
+        no_rows = self.current_main_set.sample(no_samples_no)
         self.current_main_set.drop(no_rows.index, inplace=True)
+        #change the label of the selected rows to 0
+        no_rows['label'] = 0
 
         # combine the selected rows to create the initial training set
         self.current_X = pd.concat([self.current_X, yes_rows.drop('label', axis=1), no_rows.drop('label', axis=1)])

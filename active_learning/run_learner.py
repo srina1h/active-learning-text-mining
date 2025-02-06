@@ -103,7 +103,7 @@ def perform_stat_validation(file_path, filename, output_folder, no_statistical_v
     output_file.write(f"Mean recall: {np.mean(total_recall, axis=0)}\n")
     output_file.write(f"Standard deviation of recall: {np.std(total_recall, axis=0)}\n")
 
-    create_stat_graph(np.percentile(total_recall, q = 50, axis=0), np.percentile(total_recall, q = 25, axis=0), np.percentile(total_recall, q=75, axis=0), baseline_recall, filename, output_folder+'/', no_iterations, no_statistical_validation)
+    create_stat_graph(np.percentile(total_recall, q = 50, axis=0), np.percentile(total_recall, q = 25, axis=0), np.percentile(total_recall, q=75, axis=0), baseline_recall, filename, output_folder+'/', no_iterations, no_statistical_validation, initial_samples_yes)
 
     return np.percentile(total_recall, q = 50, axis=0), np.percentile(total_recall, q = 25, axis=0), np.percentile(total_recall, q=75, axis=0), no_iterations, baseline_recall
 

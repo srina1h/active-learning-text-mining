@@ -1,3 +1,0 @@
-Filename: Hall
-Running statistical validation for 5 runs:
-Recalls for statistical validation run 1: [0.46153846 0.46153846 0.46153846 ... 0.96153846 0.96153846 0.96153846]

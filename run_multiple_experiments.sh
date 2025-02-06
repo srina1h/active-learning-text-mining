@@ -17,9 +17,9 @@ RAW_DATA_DIR=data_folder
 # PREPROCESSED_DATA_DIR=preprocessed_data
 
 # Runtime parameters
-iteration_type=all
+iteration_type=few
 no_iterations=100
-no_statistical_validation=20
+no_statistical_validation=5
 
 for top_tf_idf in 50 25 10 5
 do
