@@ -54,6 +54,17 @@ class DataHandler:
 
         return
     
+    def select_next_with_idx(self, idx):
+
+        next_samples = self.current_main_set.iloc[idx]
+        self.current_main_set.drop(next_samples.index, inplace=True)
+        sample_x = next_samples.drop('label', axis=1)
+        sample_y = next_samples['label']
+        self.current_X = pd.concat([self.current_X, next_samples.drop('label', axis=1)])
+        self.current_y = pd.concat([self.current_y, next_samples['label']])
+
+        return sample_x, sample_y
+    
     def resample_main_set(self, sample_percent = 0.9):
         # randomly sample 90% of the data for the main set
         self.current_main_set = self.full_dataset.sample(frac=sample_percent)

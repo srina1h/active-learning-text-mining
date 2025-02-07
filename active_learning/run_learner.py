@@ -5,6 +5,7 @@ from ActiveLearner import ActiveLearner
 from GenerateOutput import *
 import numpy as np
 import time
+import pickle
 
 # run a command line interface for the active learner
 # example usage: python3 active_learning/run_learner.py preprocessed_data output Hall 4 0.25 10 50
@@ -35,20 +36,50 @@ def main():
 
     perform_stat_validation_on_multiple_start(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf)
 
-def perform_stat_validation_on_multiple_start(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf):
-    sample_ratio = 0.25
+def run_multiple_learners(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf):
+    model_types = ['GPM', 'NB']
     initial_samples_yes = [8, 16, 32]
 
+    recall_fifty_percentiles = []
+    recall_twenty_five_percentiles = []
+    recall_seventy_five_percentiles = []
+    
+    for model_type in model_types:
+        fifties, twenty_fives, seventy_fives, baseline_recall = perform_stat_validation(file_path, filename, output_folder + '/' +str(model_type), no_statistical_validation, iteration_type, no_iterations, top_tfidf, initial_samples_yes, model_type)
+        recall_fifty_percentiles.append(fifties)
+        recall_twenty_five_percentiles.append(twenty_fives)
+        recall_seventy_five_percentiles.append(seventy_fives)
+    
+    for i in range(len(initial_samples_yes)):
+        fif = [recall_fifty_percentiles[0][i], recall_fifty_percentiles[1][i]]
+        twen = [recall_twenty_five_percentiles[0][i], recall_twenty_five_percentiles[1][i]]
+        seven = [recall_seventy_five_percentiles[0][i], recall_seventy_five_percentiles[1][i]]
+        compare_models_graph(fif, twen, seven, baseline_recall, initial_samples_yes[i], filename, output_folder, no_iterations, no_statistical_validation, top_tfidf, model_types)
+    
+    # pickle the 3 comprehensive lists
+    with open(output_folder + '/recall_fifty_percentiles.pkl', 'wb') as f:
+        pickle.dump(recall_fifty_percentiles, f)
+    with open(output_folder + '/recall_twenty_five_percentiles.pkl', 'wb') as f:
+        pickle.dump(recall_twenty_five_percentiles, f)
+    with open(output_folder + '/recall_seventy_five_percentiles.pkl', 'wb') as f:
+        pickle.dump(recall_seventy_five_percentiles, f)
+
+
+def perform_stat_validation_on_multiple_start(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf, initial_samples_yes, model_type):
+    sample_ratio = 0.25
+    
     fifties = []
     twenty_fives = []
     seventy_fives = []
+
+    print(f"Running active learner on model_type {model_type}")
 
     for no_yes in initial_samples_yes:
         sub_output_folder = output_folder + '/' + str(no_yes) + '_' + str(no_statistical_validation) + '_' + str(no_iterations)
         os.makedirs(sub_output_folder, exist_ok=True)
         # time the time to perform stat validation
         st = time.time()
-        per_50, per_25, per_75, itr, baseline_recall = perform_stat_validation(file_path, filename, sub_output_folder, no_statistical_validation, iteration_type, no_iterations, no_yes, sample_ratio)
+        per_50, per_25, per_75, itr, baseline_recall = perform_stat_validation(file_path, filename, sub_output_folder, no_statistical_validation, iteration_type, no_iterations, no_yes, sample_ratio, model_type)
         et = time.time()
         print(f"Avg Time taken for active learner to learn over {iteration_type} iterations: {(et-st)/no_statistical_validation}")
         fifties.append(per_50)
@@ -58,7 +89,9 @@ def perform_stat_validation_on_multiple_start(file_path, filename, output_folder
     # put the different initial yes sample starts in the same graph
     create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recall, initial_samples_yes, filename, output_folder, itr, no_statistical_validation, top_tfidf)
 
-def perform_stat_validation(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, initial_samples_yes, sample_ratio):
+    return fifties, twenty_fives, seventy_fives, baseline_recall
+
+def perform_stat_validation(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, initial_samples_yes, sample_ratio, model_type):
     data_handler = DataHandler(file_path)
     learner = ActiveLearner(data_handler)
 
@@ -83,7 +116,7 @@ def perform_stat_validation(file_path, filename, output_folder, no_statistical_v
         data_handler.resample_main_set(0.9)
 
         learner.select_initial_data(initial_samples_yes, sample_ratio)
-        recalls = learner.run_active_learning(output_folder, no_iterations)
+        recalls = learner.run_active_learning(output_folder, model_type, no_iterations)
 
         et = time.time()
         print(f"Avg time taken by learner per iteration: {(et-st)/no_iterations}")

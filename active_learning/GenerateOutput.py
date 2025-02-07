@@ -88,3 +88,32 @@ def create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recalls
     plt.title('Learner Recalls with '+str(top_tfidf)+' TF-IDF features')
     plt.savefig(output_folder+'/combined_statistical_performance_'+filename+'.pdf', bbox_inches='tight')
     return
+
+def compare_models_graph(fifties, twenty_fives, seventy_fives, baseline_recalls, start, filename, output_folder, iterations, no_statistical_validation, top_tfidf, model_types):
+    plt.clf()
+    sns.set_style("whitegrid")
+
+    colors = ['royalblue', 'green']
+    colorbands = ['skyblue', 'mediumaquamarine']
+
+    for i, model in enumerate(model_types):
+        x_coor = range(start, len(twenty_fives[i]) + start)
+        plt.plot(x_coor, fifties[i], label='50th percentile - '+str(model), linestyle='solid', color=colors[i])
+        plt.plot(x_coor, twenty_fives[i], label='25th percentile - '+str(model), linestyle='dotted', color=colorbands[i])
+        plt.plot(x_coor, seventy_fives[i], label='75th percentile - '+str(model), linestyle='dashed', color=colorbands[i])
+
+        plt.fill_between(x_coor, twenty_fives[i], seventy_fives[i], alpha=0.2, color=colorbands[i])
+
+        plt.axvline(x=start, color='black', linestyle='dotted', alpha=0.5)
+        plt.text(start, 0.1, 'Labeling Budget - '+str(start), rotation=90)
+
+    plt.plot(baseline_recalls, label='Baseline', linestyle='dashdot', color='red')
+
+    plt.xlabel('Per iteration recall variance ('+str(iterations)+' iterations over '+str(no_statistical_validation)+' runs)')
+    plt.ylabel('Recall')
+    plt.ylim(0, 1)
+    plt.xscale('log')
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.title('Comparing learners\' Recalls with '+str(top_tfidf)+' TF-IDF features')
+    plt.savefig(output_folder+'/combined_statistical_performance_'+filename+'.pdf', bbox_inches='tight')
+    return
