@@ -49,10 +49,12 @@ class DataHandler:
 
         next_samples = self.current_main_set.iloc[scores.argsort()[-no_samples:]]
         self.current_main_set.drop(next_samples.index, inplace=True)
+        sample_x = next_samples.drop('label', axis=1)
+        sample_y = next_samples['label']
         self.current_X = pd.concat([self.current_X, next_samples.drop('label', axis=1)])
         self.current_y = pd.concat([self.current_y, next_samples['label']])
 
-        return
+        return sample_x, sample_y
     
     def select_next_with_idx(self, idx):
 

@@ -34,7 +34,7 @@ def main():
     
     OUTPUT_FOLDER = args.output_folder + '/' + args.filename
 
-    perform_stat_validation_on_multiple_start(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf)
+    run_multiple_learners(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf)
 
 def run_multiple_learners(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf):
     model_types = ['GPM', 'NB']
@@ -45,7 +45,9 @@ def run_multiple_learners(file_path, filename, output_folder, no_statistical_val
     recall_seventy_five_percentiles = []
     
     for model_type in model_types:
-        fifties, twenty_fives, seventy_fives, baseline_recall = perform_stat_validation(file_path, filename, output_folder + '/' +str(model_type), no_statistical_validation, iteration_type, no_iterations, top_tfidf, initial_samples_yes, model_type)
+        #create a folder for the model type
+        os.makedirs(output_folder + '/' + str(model_type), exist_ok=True)
+        fifties, twenty_fives, seventy_fives, baseline_recall = perform_stat_validation_on_multiple_start(file_path, filename, output_folder + '/' +str(model_type), no_statistical_validation, iteration_type, no_iterations, top_tfidf, initial_samples_yes, model_type)
         recall_fifty_percentiles.append(fifties)
         recall_twenty_five_percentiles.append(twenty_fives)
         recall_seventy_five_percentiles.append(seventy_fives)
@@ -116,7 +118,7 @@ def perform_stat_validation(file_path, filename, output_folder, no_statistical_v
         data_handler.resample_main_set(0.9)
 
         learner.select_initial_data(initial_samples_yes, sample_ratio)
-        recalls = learner.run_active_learning(output_folder, model_type, no_iterations)
+        recalls = learner.run_active_learning(output_folder, no_iterations, model_type)
 
         et = time.time()
         print(f"Avg time taken by learner per iteration: {(et-st)/no_iterations}")

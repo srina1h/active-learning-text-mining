@@ -17,7 +17,7 @@ RAW_DATA_DIR=data_folder
 # PREPROCESSED_DATA_DIR=preprocessed_data
 
 # Runtime parameters
-iteration_type=few
+iteration_type=all
 no_iterations=100
 no_statistical_validation=5
 
@@ -25,10 +25,10 @@ for top_tf_idf in 50 25 10 5
 do
     OUTPUT_DIR=test_op_$top_tf_idf
     PREPROCESSED_DATA_DIR=preprocessed_data_$top_tf_idf
-    mkdir -p $OUTPUT_DIR
-    mkdir -p $PREPROCESSED_DATA_DIR
+    # mkdir -p $OUTPUT_DIR
+    # mkdir -p $PREPROCESSED_DATA_DIR
 
-    python3 preprocessing/preprocess_folder.py $RAW_DATA_DIR/ $top_tf_idf $PREPROCESSED_DATA_DIR/
+    # python3 preprocessing/preprocess_folder.py $RAW_DATA_DIR/ $top_tf_idf $PREPROCESSED_DATA_DIR/
 
     for file in Hall Kitchenham Wahono Radjenovic
     do
