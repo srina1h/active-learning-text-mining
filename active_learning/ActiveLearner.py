@@ -87,6 +87,12 @@ class ActiveLearner:
         most_uncertain_index = np.argsort(latent_variance)[-1:]
         return most_uncertain_index
     
+    def GP_entropy(self, gpc, X):
+        preds = gpc.predict_proba(X)
+        entropy = -np.sum(preds * np.log(preds), axis=1)
+        most_uncertain_index = np.argsort(entropy)[-1:]
+        return most_uncertain_index
+
     def run_active_learning(self, output_folder, no_iterations, model_type, initial_q = 1):
         final_q = 0
         labeling_budget = 100
@@ -153,21 +159,33 @@ class ActiveLearner:
             case 'GPM':
                 # Gaussian Process model
                 kernel = 1.0 * sk.gaussian_process.kernels.RBF(length_scale=1.0)
-                gpc = GPCWithVariance(kernel=kernel)
+                # gpc = GPCWithVariance(kernel=kernel)
+                gpc = sk.gaussian_process.GaussianProcessClassifier(kernel=kernel, n_jobs=-1)
                 
                 gpc.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
+
+                extra_labeling = 50
 
                 # Initial evaluation
                 recalls[0] = sk.metrics.recall_score(self.data_handler.test_y, gpc.predict(self.data_handler.test_X), average='binary', pos_label=1)
 
                 # Active learning loop
                 for i in range(1, no_iterations):
+                    print(f"Iteration {i}")
                     current_main_set_X = self.data_handler.current_main_set.drop('label', axis=1)
 
-                    query_idx = self.GP_clf_Var(gpc, current_main_set_X)
-                    sample_x, sample_y = self.data_handler.select_next_with_idx(query_idx)
+                    if extra_labeling > 0:
+                        # query_idx = self.GP_clf_Var(gpc, current_main_set_X)
+                        # sample random 100 samples from the dataset
+                        random_100_set = np.random.choice(current_main_set_X.index, size=100, replace=False)
+                        # now calculate the entropy of the random 100 samples
+                        query_idx = self.GP_entropy(gpc, current_main_set_X.loc[random_100_set])
+                        # find a sample in the current_main_set using the query_idx
 
-                    gpc.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
+                        sample_x, sample_y = self.data_handler.select_next_with_idx(query_idx)
+
+                        gpc.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
+                        extra_labeling -= 1
 
                     # evaluate the classifier on entire dataset
                     predictions = gpc.predict(self.data_handler.test_X)
