@@ -4,9 +4,10 @@ from typing import Tuple, Union
 
 class GPCWithVariance(sk.gaussian_process.GaussianProcessClassifier):
 
-    def __init__(self, kernel = 'rbf'):
+    def __init__(self, kernel = 'rbf', n_jobs = -1):
         self.kernel = kernel
-        super().__init__(kernel=kernel)
+        self.n_jobs = n_jobs
+        super().__init__(kernel=kernel, n_jobs=n_jobs)
 
     def predict_a(
         self, X: np.ndarray, return_std: bool = False
