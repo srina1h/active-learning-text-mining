@@ -154,7 +154,7 @@ class ActiveLearner:
                         query_idx = self.GP_entropy(gpc, current_main_set_X.loc[random_100_set])
                         # find a sample in the current_main_set using the query_idx
 
-                        sample_x, sample_y = self.data_handler.select_next_with_idx(query_idx)
+                        _, _ = self.data_handler.select_next_with_idx(query_idx)
 
                         gpc.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
                         extra_labeling -= 1
