@@ -28,7 +28,7 @@ do
     # mkdir -p $OUTPUT_DIR
     # mkdir -p $PREPROCESSED_DATA_DIR
 
-    # python3 preprocessing/preprocess_folder.py $RAW_DATA_DIR/ $top_tf_idf $PREPROCESSED_DATA_DIR/
+    python3 preprocessing/preprocess_folder.py $RAW_DATA_DIR/ $top_tf_idf $PREPROCESSED_DATA_DIR/
 
     for file in Hall Kitchenham Wahono Radjenovic
     do

@@ -100,35 +100,6 @@ class ActiveLearner:
 
         match model_type:
             case 'NB':
-                # for i in range(no_iterations):
-                #     if i < labeling_budget:
-                #         q = initial_q - (initial_q - final_q) * i / no_iterations
-                #     else:
-                #         q = final_q
-
-                #     clf = sk.naive_bayes.GaussianNB()
-                #     clf.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
-
-                #     # evaluate the classifier on data_handler.current_main_set and select the next sample
-
-                #     current_main_set_X = self.data_handler.current_main_set.drop('label', axis=1)
-
-                #     # get predictions on the entire dataset
-                #     predictions = clf.predict(self.data_handler.test_X)
-
-                #     # get probabilities on the remaining dataset to acquire new samples
-                #     probabilities = clf.predict_proba(current_main_set_X)
-
-                #     # Performance on entire dataset
-                #     recall = sk.metrics.recall_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
-
-                #     # calculate the acquisition function`s scores
-                #     scores = self.weighted_best_from_rest(probabilities, q)
-
-                #     self.data_handler.select_next_active_learning_sample(scores, 1)
-
-                #     recalls[i] = recall
-
                 clf = sk.naive_bayes.GaussianNB()
                 clf.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
 
@@ -152,10 +123,11 @@ class ActiveLearner:
 
                     clf.partial_fit(sample_x, sample_y)
 
+                    clf.predict(self.data_handler.test_X)
+
                     # Performance on entire dataset
                     recall = sk.metrics.recall_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
                     recalls[i] = recall
-
             case 'GPM':
                 # Gaussian Process model
                 kernel = 1.0 * sk.gaussian_process.kernels.RBF(length_scale=1.0)
