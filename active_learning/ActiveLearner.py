@@ -123,10 +123,10 @@ class ActiveLearner:
 
                     clf.partial_fit(sample_x, sample_y)
 
-                    clf.predict(self.data_handler.test_X)
+                    new_preds = clf.predict(self.data_handler.test_X)
 
                     # Performance on entire dataset
-                    recall = sk.metrics.recall_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
+                    recall = sk.metrics.recall_score(self.data_handler.test_y, new_preds, average='binary', pos_label=1)
                     recalls[i] = recall
             case 'GPM':
                 # Gaussian Process model
