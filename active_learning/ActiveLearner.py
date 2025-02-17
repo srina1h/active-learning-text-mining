@@ -21,7 +21,7 @@ class ActiveLearner:
         scores = (best + q * rest) / (np.abs(q * best - rest) + 1e-10)
         return scores
     
-    def ucb_acquisition_proba(predict_proba, kappa=1.0):
+    def ucb_acquisition_proba(self, predict_proba, kappa=1.0):
         """
         Compute a UCB-like acquisition score using predicted probabilities.
 
