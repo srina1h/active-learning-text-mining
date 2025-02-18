@@ -88,21 +88,26 @@ class ActiveLearner:
                 recalls[0] = sk.metrics.recall_score(self.data_handler.test_y, gpc.predict(self.data_handler.test_X), average='binary', pos_label=1)
 
                 # Active learning loop
+                skipped_itrs = 0
+                prev_recall = recalls[0]
                 for i in range(1, no_iterations):
                     print(f"Iteration {i}")
-                    current_main_set_X = self.data_handler.current_main_set.drop('label', axis=1)
+                    if i % 1000 == 0 or i == no_iterations - 1:
+                        current_main_set_X = self.data_handler.current_main_set.drop('label', axis=1)
 
-                    scores = self.ucb_acquisition_proba(gpc.predict_proba(current_main_set_X), 1)
+                        scores = self.ucb_acquisition_proba(gpc.predict_proba(current_main_set_X), 1)
 
-                    _, _ = self.data_handler.select_next_active_learning_sample(scores)
+                        _, _ = self.data_handler.select_next_active_learning_sample(scores, skipped_itrs)
+                        skipped_itrs = 0
 
-                    if i % 100 == 0 or i == 1 or i == no_iterations - 1:
                         gpc.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
 
-                    # evaluate the classifier on entire dataset
-                    predictions = gpc.predict(self.data_handler.test_X)
+                        # evaluate the classifier on entire dataset
+                        predictions = gpc.predict(self.data_handler.test_X)
 
-                    # Performance on entire dataset
-                    recall = sk.metrics.recall_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
-                    recalls[i] = recall
+                        # Performance on entire dataset
+                        prev_recall = sk.metrics.recall_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
+                    else:
+                        skipped_itrs += 1
+                    recalls[i] = prev_recall
         return recalls
