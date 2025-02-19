@@ -26,8 +26,9 @@ class DataHandler:
         scaler = MinMaxScaler()
 
         # cast dataframe columns other than label to float
-        self.full_dataset.iloc[:, 1:] = self.full_dataset.iloc[:, 1:].astype(float)
+        self.full_dataset = self.full_dataset.astype(object)
         self.full_dataset.iloc[:, 1:] = scaler.fit_transform(self.full_dataset.iloc[:, 1:])
+        self.full_dataset = self.full_dataset.astype(float)
 
     def select_samples_initial(self, no_samples_yes, sample_ratio=0.25):
         no_samples_no = int(no_samples_yes * (1/sample_ratio))
