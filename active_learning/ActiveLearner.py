@@ -94,13 +94,14 @@ class ActiveLearner:
                 for i in range(1, no_iterations):
                     print(f"Iteration {i}")
                     
-                    if i % 1000 == 0 or i == no_iterations - 1:
+                    if i % 100 == 0 or i == no_iterations - 1:
                         st = time.time()
                         current_main_set_X = self.data_handler.current_main_set.drop('label', axis=1)
 
                         scores = self.ucb_acquisition_proba(gpc.predict_proba(current_main_set_X), 1)
 
                         _, _ = self.data_handler.select_next_active_learning_sample(scores, skipped_itrs)
+                        print(f"Selecting {skipped_itrs} samples")
                         skipped_itrs = 0
 
                         gpc.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
