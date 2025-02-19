@@ -50,11 +50,11 @@ def run_single_learner(file_path, filename, output_folder, no_statistical_valida
     # pickle the 3 comprehensive lists
     with open(output_folder + '/' + model_type + '/recall_fifty_percentiles.pkl', 'wb') as f:
         pickle.dump(fifties, f)
-    with open(output_folder + '/recall_twenty_five_percentiles.pkl', 'wb') as f:
+    with open(output_folder + '/' + model_type + '/recall_twenty_five_percentiles.pkl', 'wb') as f:
         pickle.dump(twenty_fives, f)
-    with open(output_folder + '/recall_seventy_five_percentiles.pkl', 'wb') as f:
+    with open(output_folder + '/' + model_type + '/recall_seventy_five_percentiles.pkl', 'wb') as f:
         pickle.dump(seventy_fives, f)
-    with open(output_folder + '/baseline_recall.pkl', 'wb') as f:
+    with open(output_folder + '/' + model_type + '/baseline_recall.pkl', 'wb') as f:
         pickle.dump(baseline_recall, f)
 
 def run_multiple_learners(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf):
