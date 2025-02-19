@@ -19,9 +19,9 @@ RAW_DATA_DIR=data_folder
 # Runtime parameters
 iteration_type=all
 no_iterations=100
-no_statistical_validation=20
+no_statistical_validation=1
 
-for top_tf_idf in 50 25 10 5
+for top_tf_idf in 50
 do
     OUTPUT_DIR=test_op_$top_tf_idf
     PREPROCESSED_DATA_DIR=preprocessed_data_$top_tf_idf
@@ -36,6 +36,6 @@ do
     for file in Hall Kitchenham Wahono Radjenovic
     do
         mkdir -p $OUTPUT_DIR/$file
-        python3 $FILENAME $PREPROCESSED_DATA_DIR $OUTPUT_DIR $file $iteration_type $no_iterations $no_statistical_validation $top_tf_idf all
+        python3 $FILENAME $PREPROCESSED_DATA_DIR $OUTPUT_DIR $file $iteration_type $no_iterations $no_statistical_validation $top_tf_idf GPM
     done
 done

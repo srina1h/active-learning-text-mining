@@ -1,9 +1,11 @@
 import pandas as pd
 import os
+from sklearn.preprocessing import MinMaxScaler
 
 class DataHandler:
     def __init__(self, file_path):
         self.full_dataset = self.load_preprocessed_data(file_path)
+        self.normalize_data()
         self.resample_main_set()
         self.set_test_set()
     
@@ -18,6 +20,12 @@ class DataHandler:
         except Exception as e:
             print(f"An error occurred while loading the data: {e}")
             return None
+    
+    def normalize_data(self):
+        # normalize all columns except the label column using the min-max scaler in sklean
+        scaler = MinMaxScaler()
+
+        self.full_dataset.iloc[:, 1:] = scaler.fit_transform(self.full_dataset.iloc[:, 1:])
 
     def select_samples_initial(self, no_samples_yes, sample_ratio=0.25):
         no_samples_no = int(no_samples_yes * (1/sample_ratio))
@@ -33,7 +41,7 @@ class DataHandler:
         # ALTERNATE METHOD FOR SELECTING NO SAMPLES (2/5/25)
 
         # select no_samples_no rows at random. Assume they are negative samples
-        no_rows = self.current_main_set.sample(no_samples_no)
+        no_rows = self.current_main_set.sample(no_samples_no, random_state=42)
         self.current_main_set.drop(no_rows.index, inplace=True)
         #change the label of the selected rows to 0
         no_rows['label'] = 0
@@ -69,6 +77,6 @@ class DataHandler:
     
     def resample_main_set(self, sample_percent = 0.9):
         # randomly sample 90% of the data for the main set
-        self.current_main_set = self.full_dataset.sample(frac=sample_percent)
+        self.current_main_set = self.full_dataset.sample(frac=sample_percent, random_state=42)
         self.current_X = pd.DataFrame()
         self.current_y = pd.DataFrame()

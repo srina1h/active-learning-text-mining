@@ -7,20 +7,16 @@ import numpy as np
 import time
 import pickle
 
-# run a command line interface for the active learner
-# example usage: python3 active_learning/run_learner.py preprocessed_data output Hall 4 0.25 10 50
-
 def main():
     parser = argparse.ArgumentParser(description="Run the active learner on a preprocessed dataset.")
     parser.add_argument('preprocessed_data_folder', type=str, help='Path to the folder containing the preprocessed data', default='preprocessed_data')
     parser.add_argument('output_folder', type=str, help='Path to the folder to save the output files', default='output')
     parser.add_argument('filename', type=str, help='Name of the file to run the active learner on (without the .csv extension)', default='Hall')
-    # parser.add_argument('initial_samples_yes', type=int, help='Number of initial samples to select from the "yes" class', default=4)
-    # parser.add_argument('sample_ratio', type=float, help='Ratio of "yes" samples to "no" samples in the initial sample set', default=0.25)
     parser.add_argument('iteration_type', type=str, help=' all or few - Run active learning on all samples? or custom - specified in no_iterations', default='all')
     parser.add_argument('no_iterations', type=int, help='Number of iterations to run the active learner', default=10)
     parser.add_argument('no_statistical_validation', type=int, help='Number of iterations to run the active learner', default=20)
     parser.add_argument('tfidf', type=int, help='top tfidf feature count', default=50)
+    parser.add_argument('compare_models', type=str, help='Which models to compare', default='all')
 
     args = parser.parse_args()
 
@@ -33,8 +29,33 @@ def main():
     print(f"Running active learner on {file_path}")
     
     OUTPUT_FOLDER = args.output_folder + '/' + args.filename
+    match args.compare_models:
+        case 'all':
+            run_multiple_learners(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf)
+        case 'NB':
+            run_single_learner(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf, 'NB')
+        case 'GPM':
+            run_single_learner(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf, 'GPM')
 
-    run_multiple_learners(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf)
+def run_single_learner(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf, model_type):
+    if model_type == 'GPM':
+        initial_samples_yes = [32]
+    else:
+        initial_samples_yes = [8, 16, 32]
+
+    os.makedirs(output_folder + '/' + str(model_type), exist_ok=True)
+
+    fifties, twenty_fives, seventy_fives, baseline_recall = perform_stat_validation_on_multiple_start(file_path, filename, output_folder + '/' + str(model_type), no_statistical_validation, iteration_type, no_iterations, top_tfidf, initial_samples_yes, model_type)
+    
+    # pickle the 3 comprehensive lists
+    with open(output_folder + '/' + model_type + '/recall_fifty_percentiles.pkl', 'wb') as f:
+        pickle.dump(fifties, f)
+    with open(output_folder + '/recall_twenty_five_percentiles.pkl', 'wb') as f:
+        pickle.dump(twenty_fives, f)
+    with open(output_folder + '/recall_seventy_five_percentiles.pkl', 'wb') as f:
+        pickle.dump(seventy_fives, f)
+    with open(output_folder + '/baseline_recall.pkl', 'wb') as f:
+        pickle.dump(baseline_recall, f)
 
 def run_multiple_learners(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf):
     model_types = ['GPM', 'NB']

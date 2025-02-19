@@ -1,6 +1,7 @@
 import sklearn as sk
 import numpy as np
 from typing import Tuple, Union
+import time
 
 class ActiveLearner:
     def __init__(self, data_handler):
@@ -92,7 +93,9 @@ class ActiveLearner:
                 prev_recall = recalls[0]
                 for i in range(1, no_iterations):
                     print(f"Iteration {i}")
+                    
                     if i % 1000 == 0 or i == no_iterations - 1:
+                        st = time.time()
                         current_main_set_X = self.data_handler.current_main_set.drop('label', axis=1)
 
                         scores = self.ucb_acquisition_proba(gpc.predict_proba(current_main_set_X), 1)
@@ -107,6 +110,8 @@ class ActiveLearner:
 
                         # Performance on entire dataset
                         prev_recall = sk.metrics.recall_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
+                        end = time.time()
+                        print(f"Time taken for iteration {i}: {end - st}")
                     else:
                         skipped_itrs += 1
                     recalls[i] = prev_recall
