@@ -25,6 +25,8 @@ class DataHandler:
         # normalize all columns except the label column using the min-max scaler in sklean
         scaler = MinMaxScaler()
 
+        # cast dataframe columns other than label to float
+        self.full_dataset.iloc[:, 1:] = self.full_dataset.iloc[:, 1:].astype(float)
         self.full_dataset.iloc[:, 1:] = scaler.fit_transform(self.full_dataset.iloc[:, 1:])
 
     def select_samples_initial(self, no_samples_yes, sample_ratio=0.25):
