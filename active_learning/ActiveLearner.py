@@ -94,7 +94,7 @@ class ActiveLearner:
                 for i in range(1, no_iterations):
                     print(f"Iteration {i}")
                     
-                    if i % 100 == 0 or i == no_iterations - 1:
+                    if i % 500 == 0 or i == no_iterations - 1:
                         st = time.time()
                         current_main_set_X = self.data_handler.current_main_set.drop('label', axis=1)
 
