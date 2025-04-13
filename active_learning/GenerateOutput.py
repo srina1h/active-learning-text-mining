@@ -84,7 +84,7 @@ def create_combined_graph(fifties, twenty_fives, seventy_fives, baseline_recalls
     plt.ylabel('Recall')
     plt.ylim(0, 1)
     plt.xscale('log')
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
     plt.title('Learner Recalls with '+str(top_tfidf)+' TF-IDF features')
     plt.savefig(output_folder+'/combined_statistical_performance_'+filename+'.pdf', bbox_inches='tight')
     return
@@ -113,7 +113,7 @@ def compare_models_graph(fifties, twenty_fives, seventy_fives, baseline_recalls,
     plt.ylabel('Recall')
     plt.ylim(0, 1)
     plt.xscale('log')
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
     plt.title('Comparing learners\' Recalls with '+str(top_tfidf)+' TF-IDF features')
     plt.savefig(output_folder+'/compare_model_performance_start_'+str(start)+filename+'.pdf', bbox_inches='tight')
     return
