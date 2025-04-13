@@ -23,6 +23,7 @@ class DataPreprocessor:
         """
         self.file_path = file_path
         self.data = self.load_data()
+        self.combine_title_and_abstract()
         self.data['Processed_Abstract'] = self.preprocess_abstract(self.data['Abstract'])
         self.data, self.top_tfidf_words, self.top_n_tfidf = self.calculate_top_tfidf(self.data, top_n)
         self.tfidf_frequency_df = self.calculate_frequency_of_top_tfidf_words(self.data)
@@ -41,6 +42,12 @@ class DataPreprocessor:
 
         # change the label to binary from yes no to 0, 1
         self.cleaned_df['label'] = self.cleaned_df['label'].apply(lambda x: 1 if x == 'yes' else 0)
+    
+    def combine_title_and_abstract(self):
+        """
+        Combine the 'Document Title' and 'Abstract' columns into a new column 'Title_Abstract'.
+        """
+        self.data['Abstract'] = self.data['Document Title'] + ' ' + self.data['Abstract']
 
     def load_data(self):
         """

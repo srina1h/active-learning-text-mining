@@ -93,8 +93,8 @@ def compare_models_graph(fifties, twenty_fives, seventy_fives, baseline_recalls,
     plt.clf()
     sns.set_style("whitegrid")
 
-    colors = ['royalblue', 'green']
-    colorbands = ['skyblue', 'mediumaquamarine']
+    colors = ['royalblue', 'green', 'orange']
+    colorbands = ['skyblue', 'mediumaquamarine', 'gold']
 
     for i, model in enumerate(model_types):
         x_coor = range(start, len(twenty_fives[i]) + start)

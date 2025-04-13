@@ -36,6 +36,8 @@ def main():
             run_single_learner(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf, 'NB')
         case 'GPM':
             run_single_learner(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf, 'GPM')
+        case 'SVM':
+            run_single_learner(file_path, args.filename, OUTPUT_FOLDER, args.no_statistical_validation, args.iteration_type, args.no_iterations, args.tfidf, 'SVM')
 
 def run_single_learner(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf, model_type):
     if model_type == 'GPM':
@@ -58,7 +60,7 @@ def run_single_learner(file_path, filename, output_folder, no_statistical_valida
         pickle.dump(baseline_recall, f)
 
 def run_multiple_learners(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf):
-    model_types = ['GPM', 'NB']
+    model_types = ['GPM', 'NB', 'SVM']
     initial_samples_yes = [8, 16, 32]
 
     recall_fifty_percentiles = []

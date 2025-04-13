@@ -54,11 +54,14 @@ class DataHandler:
         self.current_y = pd.concat([self.current_y, yes_rows['label'], no_rows['label']])
         return
 
-    def select_next_active_learning_sample(self, scores, no_samples=1):
+    def select_next_active_learning_sample(self, scores, no_samples=1, highest=True):
         # select thee highest scores from scores and use them to select the next samples
         # then drop these samples from the main set and add them to the current set
-
-        next_samples = self.current_main_set.iloc[scores.argsort()[-no_samples:]]
+        # if highest is True, select the highest scores, else select the lowest scores
+        if highest:
+            next_samples = self.current_main_set.iloc[scores.argsort()[-no_samples:]]
+        else:
+            next_samples = self.current_main_set.iloc[scores.argsort()[:no_samples]]
         self.current_main_set.drop(next_samples.index, inplace=True)
         sample_x = next_samples.drop('label', axis=1)
         sample_y = next_samples['label']

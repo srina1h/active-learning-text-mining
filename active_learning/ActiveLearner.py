@@ -94,7 +94,7 @@ class ActiveLearner:
                 for i in range(1, no_iterations):
                     print(f"Iteration {i}")
                     
-                    if i % 500 == 0 or i == no_iterations - 1:
+                    if i % 100 == 0 or i == no_iterations - 1:
                         st = time.time()
                         current_main_set_X = self.data_handler.current_main_set.drop('label', axis=1)
 
@@ -108,6 +108,51 @@ class ActiveLearner:
 
                         # evaluate the classifier on entire dataset
                         predictions = gpc.predict(self.data_handler.test_X)
+
+                        # Performance on entire dataset
+                        prev_recall = sk.metrics.recall_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
+                        end = time.time()
+                        print(f"Time taken for iteration {i}: {end - st}")
+                    else:
+                        skipped_itrs += 1
+                    recalls[i] = prev_recall
+            case 'SVM':
+                # Linear SVM
+
+                clf = sk.svm.LinearSVC()
+                                
+                clf.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
+
+                # Initial evaluation
+                recalls[0] = sk.metrics.recall_score(self.data_handler.test_y, clf.predict(self.data_handler.test_X), average='binary', pos_label=1)
+
+                # Active learning loop
+                skipped_itrs = 0
+                prev_recall = recalls[0]
+                for i in range(1, no_iterations):
+                    if i < labeling_budget:
+                        q = initial_q - (initial_q - final_q) * i / no_iterations
+                    else:
+                        q = final_q
+
+                    print(f"Iteration {i}")
+                    
+                    if i % 100 == 0 or i == no_iterations - 1:
+                        st = time.time()
+                        current_main_set_X = self.data_handler.current_main_set.drop('label', axis=1)
+
+                        # simply get distance from decision boundary. Low distance = high uncertainty
+                        scores = clf.decision_function(current_main_set_X)
+
+                        # pick the samples with the lowest distance from the decision boundary
+                        _, _ = self.data_handler.select_next_active_learning_sample(scores, skipped_itrs, False)
+                        print(f"Selecting {skipped_itrs} samples")
+                        skipped_itrs = 0
+
+                        clf.fit(self.data_handler.current_X, np.squeeze(self.data_handler.current_y))
+
+                        # evaluate the classifier on entire dataset
+                        predictions = clf.predict(self.data_handler.test_X)
 
                         # Performance on entire dataset
                         prev_recall = sk.metrics.recall_score(self.data_handler.test_y, predictions, average='binary', pos_label=1)
