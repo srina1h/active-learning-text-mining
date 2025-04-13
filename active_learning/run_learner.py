@@ -60,8 +60,8 @@ def run_single_learner(file_path, filename, output_folder, no_statistical_valida
         pickle.dump(baseline_recall, f)
 
 def run_multiple_learners(file_path, filename, output_folder, no_statistical_validation, iteration_type, no_iterations, top_tfidf):
-    model_types = ['GPM', 'NB', 'SVM']
-    initial_samples_yes = [8, 16, 32]
+    model_types = ['GPM', 'NB']
+    initial_samples_yes = [16, 32]
 
     recall_fifty_percentiles = []
     recall_twenty_five_percentiles = []
