@@ -26,10 +26,10 @@ do
     OUTPUT_DIR=test_op_$top_tf_idf
     PREPROCESSED_DATA_DIR=preprocessed_data_$top_tf_idf
     mkdir -p $OUTPUT_DIR
-    mkdir -p $PREPROCESSED_DATA_DIR
     
     if [ ! -d $PREPROCESSED_DATA_DIR ]
     then
+        mkdir -p $PREPROCESSED_DATA_DIR
         python3 preprocessing/preprocess_folder.py $RAW_DATA_DIR/ $top_tf_idf $PREPROCESSED_DATA_DIR/
     fi
 
