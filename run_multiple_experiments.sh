@@ -31,7 +31,7 @@ for top_tf_idf in 50 25 10; do
     python3 preprocessing/preprocess_folder.py $RAW_DATA_DIR/ $top_tf_idf $PREPROCESSED_DATA_DIR/
   fi
 
-  if ${top_tf_idf} -eq 50 ]; then
+  if [ ${top_tf_idf} -eq 50 ]; then
     for file in Wahono Radjenovic; do
       mkdir -p $OUTPUT_DIR/$file
       python3 $FILENAME $PREPROCESSED_DATA_DIR $OUTPUT_DIR $file $iteration_type $no_iterations $no_statistical_validation $top_tf_idf all
@@ -43,4 +43,3 @@ for top_tf_idf in 50 25 10; do
     done
   fi
 done
-
