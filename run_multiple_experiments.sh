@@ -37,7 +37,7 @@ for top_tf_idf in 50 25 10; do
   #     python3 $FILENAME $PREPROCESSED_DATA_DIR $OUTPUT_DIR $file $iteration_type $no_iterations $no_statistical_validation $top_tf_idf all
   #   done
   # else
-  for file in Hall Kitchenham Wahono Radjenovic; do
+  for file in Wahono Radjenovic; do
     mkdir -p $OUTPUT_DIR/$file
     python3 $FILENAME $PREPROCESSED_DATA_DIR $OUTPUT_DIR $file $iteration_type $no_iterations $no_statistical_validation $top_tf_idf all
   done
